@@ -1,9 +1,9 @@
-from collections import defaultdict
 import csv
 import datetime as dt
+from collections import defaultdict
 from pathlib import Path
 
-from settings import RESULTS_DIR
+from .settings import RESULTS_DIR
 
 
 BASE_DIR = Path(__file__).parent
@@ -31,9 +31,9 @@ class PepParsePipeline:
     def close_spider(self, spider):
         time = dt.datetime.now().strftime(DATETIME_FORMAT)
         file_path = self.results_dir / PREFIX_NAME.format(time)
-        self.output_file = csv.writer(
-            open(file_path, 'w')
-        )
-        self.output_file.writerow(TITLE_NAMES)
-        self.status_counts[TOTAL_NAME] = sum(self.status_counts.values())
-        self.output_file.writerows(self.status_counts.items())
+        with open(file_path, 'w', encoding='utf-8') as f:
+            csv.writer(f, dialect='unix').writerows([
+                ('Статус', 'Количество'),
+                *self.status_counts.items(),
+                ('Total', sum(self.status_counts.values())),
+            ])

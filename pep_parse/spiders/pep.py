@@ -22,10 +22,10 @@ class PepSpider(scrapy.Spider):
     def parse_pep(self, response):
         header = response.css('h1.page-title::text').get()
         number, name = re.search(SEARCH_PATTERN, header).groups()
-        yield PepParseItem({
-            'number': number,
-            'name': name,
-            'status': response.css(
+        yield PepParseItem(dict(
+            number=number,
+            name=name,
+            status=response.css(
                 'dt:contains("Status") + dd > abbr::text'
             ).get()
-        })
+        ))
